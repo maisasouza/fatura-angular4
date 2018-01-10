@@ -1,0 +1,24 @@
+<div class="card-header lighten-1 white-text">
+    Nova Fatura
+</div>
+<div class="card-body">
+    <form>
+        <div class="form-group">
+            <label for="inputReferencia">Referência</label>
+            <input type="text" class="form-control" name="inputReferencia" aria-describedby="emailHelp" placeholder="mm/aaaa" [(ngModel)]=referencia>
+            <small class="form-text text-muted"> Mês do vencimento da fatura </small>
+
+        </div>
+        <div class="form-group">
+            <label for="bancoSelect">Banco: </label>
+            <select class="form-control" name="bancoSelect" [(ngModel)]="bancoSelecionado">
+              <option *ngFor="let banco of bancos" [ngValue]="banco"> {{banco}} </option>
+            </select>
+            <small class="form-text text-muted"> Para Bradesco e BB importar como txt do site do banco, para Itau copiar do html e montar o txt manualmente </small>
+        </div>
+    </form>
+    <button class="btn btn-primary" (click)="carregarFatura()"> Carregar Fatura </button>
+    <div class="input-group mt-sm-4">
+        <input type="file" name="inputArquivo" (change)="lerArquivo($event)" value="$event.files">
+    </div>
+</div>
