@@ -8,6 +8,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { AppComponent } from './app.component';
 import { NovaFaturaComponent } from './nova-fatura/nova-fatura.component';
 import { RelatoriosComponent } from './relatorios/relatorios.component';
+import { PersistenciaService } from 'app/persistencia.service';
 
 const appRoutes: Routes = [
   { path: 'novaFatura', component: NovaFaturaComponent },
@@ -29,7 +30,7 @@ const appRoutes: Routes = [
       appRoutes
     )
   ],
-  providers: [],
+  providers: [PersistenciaService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

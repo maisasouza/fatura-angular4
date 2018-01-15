@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { forEach } from '@angular/router/src/utils/collection';
 import { Conta } from '../conta';
+import { PersistenciaService } from 'app/persistencia.service';
 
 @Component({
   selector: 'app-nova-fatura',
@@ -14,9 +15,10 @@ export class NovaFaturaComponent implements OnInit {
   referencia: string;
   bancoSelecionado: string;
   faturaCarregada = false;
-  itensFatura: Array<Conta>;
+  itensFatura: Array<Conta> = new Array<Conta>();
   self = this;
   totalConta = 0;
+  naoExisteFaturaNoBanco = false;
 
   resumoConta = {
     totalConta: 0,
@@ -26,7 +28,7 @@ export class NovaFaturaComponent implements OnInit {
   };
 
 
-  constructor() { }
+  constructor(private persistenciaService: PersistenciaService) { }
 
   ngOnInit() {
     this.bancoSelecionado = this.bancos[0];
@@ -39,11 +41,23 @@ export class NovaFaturaComponent implements OnInit {
       totalMaisa: 0,
       totalElias: 0
     };
+
   }
 
   carregarFatura() {
-    console.log('Teoricamente carreguei a fatura');
-    this.faturaCarregada = true;
+    const mesReferencia = parseInt(this.referencia.substring(0, 2), 10) - 1;
+    const anoReferencia = this.referencia.substring(3, 7);
+    const dataReferencia = new Date(parseInt(anoReferencia, 10), mesReferencia, 1);
+
+    this.persistenciaService.getContasPorReferenciaEBanco(dataReferencia, this.bancoSelecionado).subscribe((data) => {
+      this.faturaCarregada = true;
+      if (data !== null && data.length > 0) {
+        this.itensFatura = data;
+        this.calcularTotais();
+      } else {
+        this.naoExisteFaturaNoBanco = true;
+      }
+    });
   }
 
   lerArquivo(event: any) {
@@ -55,7 +69,6 @@ export class NovaFaturaComponent implements OnInit {
       if (self.bancoSelecionado === 'Bradesco') {
         self.preencherFaturaBradesco(conteudo, self);
       }
-      self.preencherItensFatura(conteudo);
     };
 
     fileReader.readAsText(event.srcElement.files[0]);
@@ -64,8 +77,6 @@ export class NovaFaturaComponent implements OnInit {
 
   preencherFaturaBradesco(conteudoArquivo: string, self: any) {
     const listaValores = conteudoArquivo.split('\n');
-
-    self.itensFatura = new Array<Conta>();
 
     listaValores.forEach(function(linha, ind, arr){
       if (self.isLinhaValida(linha)) {
@@ -77,8 +88,9 @@ export class NovaFaturaComponent implements OnInit {
         const mesCompra = parseInt(linha.substring(3, 5), 10) - 1;
         const anoCompra = (mesCompra <= mesReferencia) ? anoReferencia : anoReferencia - 1;
 
-        novaConta.referencia = new Date(anoReferencia, mesReferencia, 1);
-        novaConta.data = new Date(anoCompra, mesCompra, parseInt(linha.substring(0, 2), 10));
+        novaConta.referencia.$date = new Date(anoReferencia, mesReferencia, 1);
+        novaConta.data.$date = new Date(anoCompra, mesCompra, parseInt(linha.substring(0, 2), 10));
+        novaConta.banco = self.bancoSelecionado;
         novaConta.descricao = camposDaLinha[1];
         novaConta.valorEmDolar = Number(camposDaLinha[2].replace('.', '').replace(',', '.'));
         novaConta.valor = Number(camposDaLinha[3].replace('.', '').replace(',', '.'));
@@ -96,14 +108,7 @@ export class NovaFaturaComponent implements OnInit {
     return (data.match('[0-9][0-9]/[0-1][0-9]'))
   }
 
-
-  preencherItensFatura = (conteudoArquivo: string) => {
-      // const listaValores = conteudoArquivo.split('/n');
-      // console.log('Length: ' + listaValores.length );
-  }
-
   excluirItemFatura(itemCompra: Conta) {
-
     const index = this.itensFatura.indexOf(itemCompra);
 
     if (index === -1) {
@@ -140,13 +145,25 @@ export class NovaFaturaComponent implements OnInit {
 
 
   salvarFatura() {
-
+    this.persistenciaService.adicionarContas(this.itensFatura).subscribe((response) =>{
+      console.log('Salvei Faturaaa, resposta do BD: ');
+      console.log(response);
+    });
   }
 
   /**
    * Exclusao se dará por referência e banco.
    */
   excluirFatura() {
+    const mesReferencia = parseInt(this.referencia.substring(0, 2), 10) - 1;
+    const anoReferencia = this.referencia.substring(3, 7);
+    const dataReferencia = new Date(parseInt(anoReferencia, 10), mesReferencia, 1);
+    const self = this;
 
+    this.persistenciaService.removeContasPorReferenciaEBanco(dataReferencia, this.bancoSelecionado).subscribe((data) => {
+      console.log('Resposta do PUT(DELETE): ');
+      console.log(data);
+      self.itensFatura = new Array<Conta>();
+    });
   }
 }
