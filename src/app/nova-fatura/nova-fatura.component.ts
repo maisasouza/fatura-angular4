@@ -68,6 +68,8 @@ export class NovaFaturaComponent implements OnInit {
       console.log(self.bancoSelecionado)
       if (self.bancoSelecionado === 'Bradesco') {
         self.preencherFaturaBradesco(conteudo, self);
+      } else if (self.bancoSelecionado === 'Itau') {
+        self.preencherFaturaItau(conteudo, self);
       }
     };
 
@@ -94,6 +96,34 @@ export class NovaFaturaComponent implements OnInit {
         novaConta.descricao = camposDaLinha[1];
         novaConta.valorEmDolar = Number(camposDaLinha[2].replace('.', '').replace(',', '.'));
         novaConta.valor = Number(camposDaLinha[3].replace('.', '').replace(',', '.'));
+
+        self.itensFatura.push(novaConta);
+        self.totalConta += novaConta.valor;
+      }
+    });
+
+    self.calcularTotais();
+  }
+
+  preencherFaturaItau(conteudoArquivo: string, self: any) {
+    const listaValores = conteudoArquivo.split('\n');
+
+    listaValores.forEach(function(linha, ind, arr){
+      if (self.isLinhaValida(linha)) {
+        const camposDaLinha = linha.split('\t');
+
+        const novaConta = new Conta();
+        const mesReferencia = self.referencia.substring(0, 2) - 1;
+        const anoReferencia = self.referencia.substring(3, 7);
+        const mesCompra = parseInt(linha.substring(3, 5), 10) - 1;
+        const anoCompra = (mesCompra <= mesReferencia) ? anoReferencia : anoReferencia - 1;
+
+        novaConta.referencia.$date = new Date(anoReferencia, mesReferencia, 1);
+        novaConta.data.$date = new Date(anoCompra, mesCompra, parseInt(linha.substring(0, 2), 10));
+        novaConta.banco = self.bancoSelecionado;
+        novaConta.descricao = camposDaLinha[1];
+        // novaConta.valorEmDolar = Number(camposDaLinha[2].replace('.', '').replace(',', '.'));
+        novaConta.valor = Number(camposDaLinha[2].replace('.', '').replace(',', '.'));
 
         self.itensFatura.push(novaConta);
         self.totalConta += novaConta.valor;

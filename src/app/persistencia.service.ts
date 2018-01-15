@@ -24,8 +24,7 @@ export class PersistenciaService {
     };
 
     return this.http.get<Conta[]>
-      ('https://api.mlab.com/api/1/databases/faturadb/collections/contas?apiKey=X9Bn4_SbDdHZv8FekcL6CVCA35chhKGh'); 
-      // &q=' + JSON.stringify(query));
+      ('https://api.mlab.com/api/1/databases/faturadb/collections/contas?apiKey=X9Bn4_SbDdHZv8FekcL6CVCA35chhKGh&q=' + JSON.stringify(query));
   }
 
   public removeContasPorReferenciaEBanco(referencia: Date, banco: string) {
