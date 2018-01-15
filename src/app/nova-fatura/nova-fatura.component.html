@@ -18,35 +18,41 @@
         </div>
     </form>
     <button class="btn btn-primary" (click)="carregarFatura()"> Carregar Fatura </button>
-    <div class="input-group mt-sm-4">
+    <div class="input-group mt-sm-4" *ngIf="faturaCarregada">
         <input type="file" name="inputArquivo" (change)="lerArquivo($event)" value="$event.files">
     </div>
 
-    <table class="table mt-sm-5">
-        <thead>
-            <tr>
-                <th scope="col">Data</th>
-                <th scope="col">Descricao</th>
-                <th scope="col">Valor</th>
-                <th scope="col">Rateio</th>
-                <th scope="col">Excluir</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr *ngFor="let itemCompra of itensFatura">
-                <td> {{itemCompra.data | date: 'dd/MM'}}</td>
-                <td> {{itemCompra.descricao}} </td>
-                <td> R$ {{itemCompra.valor | number: '1.2'}} </td>
-                <td> <select class="form-control" name="responsavelSelect" [(ngModel)]="itemCompra.responsavel" (change)="calcularTotais()">
+    <div *ngIf="faturaCarregada">
+        <table class="table mt-sm-5">
+            <thead>
+                <tr>
+                    <th scope="col">Data</th>
+                    <th scope="col">Descricao</th>
+                    <th scope="col">Valor</th>
+                    <th scope="col">Rateio</th>
+                    <th scope="col">Excluir</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let itemCompra of itensFatura">
+                    <td> {{itemCompra.data | date: 'dd/MM'}}</td>
+                    <td> {{itemCompra.descricao}} </td>
+                    <td> R$ {{itemCompra.valor | number: '1.2'}} </td>
+                    <td> <select class="form-control" name="responsavelSelect" [(ngModel)]="itemCompra.responsavel" (change)="calcularTotais()">
                     <option *ngFor="let responsavel of rateio" [ngValue]="responsavel"> {{responsavel}} </option>
                   </select></td>
-                <td> <button class="btn btn-danger" (click)=excluirItemFatura(itemCompra)> excluir </button></td>
-            </tr>
-        </tbody>
-    </table>
+                    <td> <button class="btn btn-danger" (click)=excluirItemFatura(itemCompra)> excluir </button></td>
+                </tr>
+            </tbody>
+        </table>
 
-    <p> Total Fatura : {{resumoConta.totalConta | number: '1.2' }} </p>
-    <p> Total Maísa : {{resumoConta.totalMaisa | number: '1.2' }} </p>
-    <p> Total Elias : {{resumoConta.totalElias | number: '1.2' }} </p>
-    <p> Restante não atribuido : {{resumoConta.restanteNaoAtribuido | number: '1.2' }} </p>
+        <p> Total Fatura : {{resumoConta.totalConta | number: '1.2' }} </p>
+        <p> Total Maísa : {{resumoConta.totalMaisa | number: '1.2' }} </p>
+        <p> Total Elias : {{resumoConta.totalElias | number: '1.2' }} </p>
+        <p> Restante não atribuido : {{resumoConta.restanteNaoAtribuido | number: '1.2' }} </p>
+
+        <button class="btn btn-primary" (click)="salvarFatura"> Salvar Fatura </button>
+        <button class="btn btn-danger" (click)="excluirFatura"> Limpar Fatura </button>
+
+    </div>
 </div>

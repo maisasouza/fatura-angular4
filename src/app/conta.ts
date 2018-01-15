@@ -1,6 +1,7 @@
 export class Conta {
     referencia: Date; //Referencia da fatura de pagamento -- sempre sera considerado dia 1
     data: Date; //Data da compra
+    banco: string;
     valor: number;
     descricao: string;
     responsavel?: string;

@@ -14,7 +14,7 @@ export class NovaFaturaComponent implements OnInit {
   referencia: string;
   bancoSelecionado: string;
   faturaCarregada = false;
-  itensFatura = [];
+  itensFatura: Array<Conta>;
   self = this;
   totalConta = 0;
 
@@ -46,7 +46,7 @@ export class NovaFaturaComponent implements OnInit {
     this.faturaCarregada = true;
   }
 
-  lerArquivo(event) {
+  lerArquivo(event: any) {
     const self = this;
     const fileReader = new FileReader();
     fileReader.onload = function () {
@@ -62,8 +62,10 @@ export class NovaFaturaComponent implements OnInit {
   }
 
 
-  preencherFaturaBradesco(conteudoArquivo, self) {
+  preencherFaturaBradesco(conteudoArquivo: string, self: any) {
     const listaValores = conteudoArquivo.split('\n');
+
+    self.itensFatura = new Array<Conta>();
 
     listaValores.forEach(function(linha, ind, arr){
       if (self.isLinhaValida(linha)) {
@@ -72,11 +74,11 @@ export class NovaFaturaComponent implements OnInit {
         const novaConta = new Conta();
         const mesReferencia = self.referencia.substring(0, 2) - 1;
         const anoReferencia = self.referencia.substring(3, 7);
-        const mesCompra = linha.substring(3, 5) - 1;
+        const mesCompra = parseInt(linha.substring(3, 5), 10) - 1;
         const anoCompra = (mesCompra <= mesReferencia) ? anoReferencia : anoReferencia - 1;
 
         novaConta.referencia = new Date(anoReferencia, mesReferencia, 1);
-        novaConta.data = new Date(anoCompra, mesCompra, linha.substring(0, 2));
+        novaConta.data = new Date(anoCompra, mesCompra, parseInt(linha.substring(0, 2), 10));
         novaConta.descricao = camposDaLinha[1];
         novaConta.valorEmDolar = Number(camposDaLinha[2].replace('.', '').replace(',', '.'));
         novaConta.valor = Number(camposDaLinha[3].replace('.', '').replace(',', '.'));
@@ -89,18 +91,18 @@ export class NovaFaturaComponent implements OnInit {
     self.calcularTotais();
   }
 
-  isLinhaValida (linha) {
+  isLinhaValida (linha: string) {
     const data = linha.substring(0, 5);
     return (data.match('[0-9][0-9]/[0-1][0-9]'))
   }
 
 
-  preencherItensFatura = (conteudoArquivo) => {
+  preencherItensFatura = (conteudoArquivo: string) => {
       // const listaValores = conteudoArquivo.split('/n');
       // console.log('Length: ' + listaValores.length );
   }
 
-  excluirItemFatura(itemCompra) {
+  excluirItemFatura(itemCompra: Conta) {
 
     const index = this.itensFatura.indexOf(itemCompra);
 
@@ -134,5 +136,17 @@ export class NovaFaturaComponent implements OnInit {
 
       self.resumoConta.restanteNaoAtribuido = self.resumoConta.totalConta - self.resumoConta.totalElias - self.resumoConta.totalMaisa;
     });
+  }
+
+
+  salvarFatura() {
+
+  }
+
+  /**
+   * Exclusao se dará por referência e banco.
+   */
+  excluirFatura() {
+
   }
 }
