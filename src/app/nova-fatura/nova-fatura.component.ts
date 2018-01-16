@@ -77,8 +77,12 @@ export class NovaFaturaComponent implements OnInit {
   }
 
   adicionarContaManual() {
-    const modalRef = this.modalService.open(NovaContaModalComponent);
-    // modalRef.componentInstance.name = 'World';
+    const self = this;
+    if (this.validaReferencia()) {
+      const modalRef = this.modalService.open(NovaContaModalComponent);
+      modalRef.componentInstance.referencia = this.getReferenciaFormatoDate();
+      modalRef.result.then(res => {if (res) { self.itensFatura.push(res); self.calcularTotais() } });
+    }
   }
 
   validaReferencia() {
@@ -92,11 +96,16 @@ export class NovaFaturaComponent implements OnInit {
     return true;
   }
 
+  getReferenciaFormatoDate() {
+    const mesReferencia = parseInt(this.referencia.substring(0, 2), 10) - 1;
+    const anoReferencia = this.referencia.substring(3, 7);
+
+    return new Date(parseInt(anoReferencia, 10), mesReferencia, 1);
+  }
+
   carregarFatura() {
     if (this.validaReferencia()) {
-      const mesReferencia = parseInt(this.referencia.substring(0, 2), 10) - 1;
-      const anoReferencia = this.referencia.substring(3, 7);
-      const dataReferencia = new Date(parseInt(anoReferencia, 10), mesReferencia, 1);
+      const dataReferencia = this.getReferenciaFormatoDate();
 
       this.persistenciaService.getContasPorReferenciaEBanco(dataReferencia, this.bancoSelecionado).subscribe((data) => {
         this.faturaCarregada = true;
@@ -144,7 +153,7 @@ export class NovaFaturaComponent implements OnInit {
         const mesCompra = parseInt(linha.substring(3, 5), 10) - 1;
         const anoCompra = (mesCompra <= mesReferencia) ? anoReferencia : anoReferencia - 1;
 
-        novaConta.referencia.$date = new Date(anoReferencia, mesReferencia, 1);
+        novaConta.referencia.$date = self.getReferenciaFormatoDate();
         novaConta.data.$date = new Date(anoCompra, mesCompra, parseInt(linha.substring(0, 2), 10));
         novaConta.banco = self.bancoSelecionado;
         novaConta.descricao = camposDaLinha[1];
@@ -172,7 +181,7 @@ export class NovaFaturaComponent implements OnInit {
         const mesCompra = parseInt(linha.substring(3, 5), 10) - 1;
         const anoCompra = (mesCompra <= mesReferencia) ? anoReferencia : anoReferencia - 1;
 
-        novaConta.referencia.$date = new Date(anoReferencia, mesReferencia, 1);
+        novaConta.referencia.$date = self.getReferenciaFormatoDate();
         novaConta.data.$date = new Date(anoCompra, mesCompra, parseInt(linha.substring(0, 2), 10));
         novaConta.banco = self.bancoSelecionado;
         novaConta.descricao = camposDaLinha[1];
@@ -190,7 +199,7 @@ export class NovaFaturaComponent implements OnInit {
   preencherFaturaBB(conteudoArquivo: string, self: any) {
     const listaValores = conteudoArquivo.split('\n');
 
-    listaValores.forEach(function(linha, ind, arr){
+    listaValores.forEach(function(linha, ind, arr) {
       if (self.isLinhaValida(linha)) {
 
         const novaConta = new Conta();
@@ -199,7 +208,7 @@ export class NovaFaturaComponent implements OnInit {
         const mesCompra = parseInt(linha.substring(3, 5), 10) - 1;
         const anoCompra = (mesCompra <= mesReferencia) ? anoReferencia : anoReferencia - 1;
 
-        novaConta.referencia.$date = new Date(anoReferencia, mesReferencia, 1);
+        novaConta.referencia.$date = self.getReferenciaFormatoDate();
         novaConta.data.$date = new Date(anoCompra, mesCompra, parseInt(linha.substring(0, 2), 10));
         novaConta.banco = self.bancoSelecionado;
         novaConta.descricao = linha.substring(10, 49);
@@ -237,7 +246,6 @@ export class NovaFaturaComponent implements OnInit {
   }
 
   calcularTotais() {
-    console.log('Entrei no calcular totais');
     this.reiniciaVariaveis();
     const self = this;
     this.itensFatura.forEach(function(element, ind, arr){
@@ -275,9 +283,7 @@ export class NovaFaturaComponent implements OnInit {
    * Exclusao se dará por referência e banco.
    */
   excluirFatura() {
-    const mesReferencia = parseInt(this.referencia.substring(0, 2), 10) - 1;
-    const anoReferencia = this.referencia.substring(3, 7);
-    const dataReferencia = new Date(parseInt(anoReferencia, 10), mesReferencia, 1);
+    const dataReferencia = this.getReferenciaFormatoDate();
     const self = this;
 
     this.persistenciaService.removeContasPorReferenciaEBanco(dataReferencia, this.bancoSelecionado).subscribe((data) => {

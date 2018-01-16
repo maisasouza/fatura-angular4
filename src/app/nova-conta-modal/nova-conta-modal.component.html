@@ -1,12 +1,24 @@
 <div class="modal-header">
-    <h4 class="modal-title">Hi there!</h4>
+    <h4 class="modal-title">Conta avulsa</h4>
     <button type="button" class="close" aria-label="Close" (click)="activeModal.dismiss('Cross click')">
       <span aria-hidden="true">&times;</span>
     </button>
 </div>
 <div class="modal-body">
-    <p>Hello, World !</p>
+    <div class="form-group">
+        <label for="dataCompraInput">Data Compra</label>
+        <input type="text" name="dataCompraInput" class="form-control" placeholder="dd/mm" [(ngModel)]="dataCompra" [textMask]="{mask: dataCompraMask}">
+    </div>
+    <div class="form-group">
+        <label for="descricaoInput">Descrição</label>
+        <input type="text" name="descricaoInput" class="form-control" [(ngModel)]="novaConta.descricao">
+    </div>
+    <div class="form-group">
+        <label for="dataCompraInput">Valor</label>
+        <input type="number" name="dataCompraInput" class="form-control" [(ngModel)]="novaConta.valor" data-number-to-fixed="2">
+    </div>
 </div>
 <div class="modal-footer">
-    <button type="button" class="btn btn-outline-dark" (click)="activeModal.close('Close click')">Close</button>
+    <button class="btn btn-primary" (click)="adicionarConta()"> Adicionar conta </button>
+    <button type="button" class="btn btn-outline-dark" (click)="activeModal.close()">Fechar</button>
 </div>

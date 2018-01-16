@@ -1,3 +1,53 @@
-<p>
-  relatorios works!
-</p>
+<div class="card-header lighten-1 white-text">
+    Relatórios
+</div>
+<div class="card-body">
+    <div class="alert alert-danger" role="alert" *ngIf="mensagemErro"> {{mensagemErro}} </div>
+    <form>
+        <div class="form-group">
+            <label for="inputReferencia">Referência</label>
+            <input type="text" class="form-control" name="inputReferencia" aria-describedby="emailHelp" placeholder="mm/aaaa" [(ngModel)]=referencia [textMask]="{mask: referenciaMask}">
+            <small class="form-text text-muted"> Mês do vencimento da fatura </small>
+        </div>
+    </form>
+    <button class="btn btn-primary" (click)="verRelatorio()"> Gerar Relatório </button>
+    <button class="btn btn-success" (click)="limparTela()"> Limpar tela </button>
+
+    <div class="input-group mt-sm-4" *ngIf="faturaCarregada && naoExisteFaturaNoBanco && !modoAvulso">
+        <input type="file" name="inputArquivo" (change)="lerArquivo($event)" value="$event.files">
+    </div>
+
+    <div *ngIf="resultado.length > 0">
+        <table class="table mt-sm-5">
+            <thead>
+                <tr>
+                    <th scope="col"> Banco </th>
+                    <th scope="col"> Total Fatura </th>
+                    <th scope="col"> Total Elias </th>
+                    <th scope="col"> Total Maisa </th>
+                    <th scope="col"> Não Atribuido </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let relatorio of resultado">
+                    <td> {{ relatorio.banco }}</td>
+                    <td> {{ relatorio.totalFatura | number: '1.2' }}</td>
+                    <td> {{ relatorio.totalElias | number: '1.2' }}</td>
+                    <td> {{ relatorio.totalMaisa | number: '1.2' }}</td>
+                    <td> {{ relatorio.totalNaoAtribuido | number: '1.2' }} </td>
+
+                </tr>
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td> TOTAL: </td>
+                    <td> {{ consolidado.totalFatura | number: '1.2' }} </td>
+                    <td> {{ consolidado.totalElias | number: '1.2' }} </td>
+                    <td> {{ consolidado.totalMaisa | number: '1.2' }} </td>
+                    <td> {{ consolidado.totalNaoAtribuido | number: '1.2' }} </td>
+                </tr>
+            </tfoot>
+        </table>
+
+    </div>
+</div>

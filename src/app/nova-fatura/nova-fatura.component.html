@@ -20,9 +20,9 @@
             <small class="form-text text-muted"> Para Bradesco e BB importar como txt do site do banco, para Itau copiar do html e montar o txt manualmente </small>
         </div>
     </form>
-    <button class="btn btn-primary" (click)="carregarFatura()" *ngIf="!modoAvulso"> Carregar Fatura </button>
+    <button class="btn btn-primary" (click)="carregarFatura()"> Carregar Fatura </button>
     <button class="btn btn-success" (click)="limparTela()"> Limpar Tela </button>
-    <button class="btn btn-default" *ngIf="modoAvulso" (click)="adicionarContaManual()"> Adicionar conta </button>
+    <button class="btn btn-default" *ngIf="faturaCarregada && modoAvulso" (click)="adicionarContaManual()"> Adicionar conta </button>
 
     <div class="input-group mt-sm-4" *ngIf="faturaCarregada && naoExisteFaturaNoBanco && !modoAvulso">
         <input type="file" name="inputArquivo" (change)="lerArquivo($event)" value="$event.files">
