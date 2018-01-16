@@ -33,6 +33,9 @@ export class RelatoriosComponent implements OnInit {
 
   verRelatorio() {
     const self = this;
+    this.resultado = new Array<Relatorio>();
+    this.consolidado = new Relatorio();
+    
     if (this.validaReferencia()) {
       this.bancos.forEach(banco => {
         const referencia = self.getReferenciaFormatoDate();

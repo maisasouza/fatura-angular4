@@ -126,7 +126,6 @@ export class NovaFaturaComponent implements OnInit {
     const fileReader = new FileReader();
     fileReader.onload = function () {
       const conteudo = fileReader.result;
-      console.log(self.bancoSelecionado)
       if (self.bancoSelecionado === 'Bradesco') {
         self.preencherFaturaBradesco(conteudo, self);
       } else if (self.bancoSelecionado === 'Itau') {
@@ -270,13 +269,23 @@ export class NovaFaturaComponent implements OnInit {
 
 
   salvarFatura() {
+    let deuErro = false;
     this.itensFatura.forEach((element) => {
       if (element._id !== undefined && element._id !== null) {
-        this.persistenciaService.editaContaEspecifica(element).subscribe();
+        this.persistenciaService.editaContaEspecifica(element).subscribe(success => {}, error => {
+          console.log('Erro persistencia conta: ' + element.descricao);
+          deuErro = true;
+        });
       } else {
-        this.persistenciaService.adicionarContas([element]).subscribe();
+        this.persistenciaService.adicionarContas([element]).subscribe(success => {}, error => {
+          console.log('Erro persistencia conta: ' + element.descricao);
+          deuErro = true;
+        });
       }
     });
+
+    this.mensagemInfo = 'Acompanhar console(F12) pra ver se nao deu erro por enquanto';
+    this.resetMensagens();
   }
 
   /**
@@ -286,10 +295,14 @@ export class NovaFaturaComponent implements OnInit {
     const dataReferencia = this.getReferenciaFormatoDate();
     const self = this;
 
-    this.persistenciaService.removeContasPorReferenciaEBanco(dataReferencia, this.bancoSelecionado).subscribe((data) => {
-      console.log('Resposta do PUT(DELETE): ');
-      console.log(data);
+    this.persistenciaService.removeContasPorReferenciaEBanco(dataReferencia, this.bancoSelecionado).subscribe((data: any) => {
       self.itensFatura = new Array<Conta>();
+      self.mensagemSucesso = data.removed + ' contas removidas com sucesso. ' + data.n + ' com erros.';
+      self.resetMensagens();
+    }, (error) => {
+      self.mensagemErro = 'Erro na exclusão. Olhar console (F12).';
+      self.resetMensagens();
+      console.log(error);
     });
   }
 }
