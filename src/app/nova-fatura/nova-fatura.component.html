@@ -2,10 +2,13 @@
     Nova Fatura
 </div>
 <div class="card-body">
+    <div class="alert alert-success" role="alert" *ngIf="mensagemSucesso"> {{mensagemSucesso}} </div>
+    <div class="alert alert-danger" role="alert" *ngIf="mensagemErro"> {{mensagemErro}} </div>
+    <div class="alert alert-info" role="alert" *ngIf="mensagemInfo"> {{mensagemInfo}} </div>
     <form>
         <div class="form-group">
             <label for="inputReferencia">Referência</label>
-            <input type="text" class="form-control" name="inputReferencia" aria-describedby="emailHelp" placeholder="mm/aaaa" [(ngModel)]=referencia>
+            <input type="text" class="form-control" name="inputReferencia" aria-describedby="emailHelp" placeholder="mm/aaaa" [(ngModel)]=referencia [textMask]="{mask: referenciaMask}">
             <small class="form-text text-muted"> Mês do vencimento da fatura </small>
 
         </div>
@@ -18,6 +21,7 @@
         </div>
     </form>
     <button class="btn btn-primary" (click)="carregarFatura()"> Carregar Fatura </button>
+    <button class="btn btn-success" (click)="limparTela()"> Limpar Tela </button>
     <div class="input-group mt-sm-4" *ngIf="faturaCarregada && naoExisteFaturaNoBanco">
         <input type="file" name="inputArquivo" (change)="lerArquivo($event)" value="$event.files">
     </div>

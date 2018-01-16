@@ -12,6 +12,7 @@ export class NovaFaturaComponent implements OnInit {
 
   bancos = ['Bradesco', 'BB', 'Itau', 'Avulsos'];
   rateio = ['Maisa', 'Elias', 'Rateio'];
+  referenciaMask = [/[0-1]/, /[0-9]/, '/', /[2]/, /[0]/, /[1-9]/, /[0-9]/];
   referencia: string;
   bancoSelecionado: string;
   faturaCarregada = false;
@@ -19,6 +20,9 @@ export class NovaFaturaComponent implements OnInit {
   self = this;
   totalConta = 0;
   naoExisteFaturaNoBanco = false;
+  mensagemSucesso: string;
+  mensagemErro: string;
+  mensagemInfo: string;
 
   resumoConta = {
     totalConta: 0,
@@ -34,6 +38,15 @@ export class NovaFaturaComponent implements OnInit {
     this.bancoSelecionado = this.bancos[0];
   }
 
+  resetMensagens() {
+    const self = this;
+    setTimeout(function(){
+      self.mensagemSucesso = undefined;
+      self.mensagemErro = undefined;
+      self.mensagemInfo = undefined;
+    }, 3000);
+  }
+
   reiniciaVariaveis() {
     this.resumoConta = {
       totalConta: 0,
@@ -41,23 +54,47 @@ export class NovaFaturaComponent implements OnInit {
       totalMaisa: 0,
       totalElias: 0
     };
+  }
 
+  limparTela() {
+    this.referencia = undefined;
+    this.bancoSelecionado = this.bancos[0];
+    this.itensFatura = new Array<Conta>();
+    this.reiniciaVariaveis();
+    this.faturaCarregada = false;
+    this.naoExisteFaturaNoBanco = false;
+  }
+
+  validaReferencia() {
+    if (this.referencia === null || this.referencia === undefined ||
+      !this.referencia.match('[0-1][0-9]/[2][0][1-9][0-9]')) {
+      this.mensagemErro = 'Referência deve ser preenchida no formato mm/yyyyy, com meses e anos válidos(a partir de 2010).';
+      this.resetMensagens();
+      return false;
+    }
+
+    return true;
   }
 
   carregarFatura() {
-    const mesReferencia = parseInt(this.referencia.substring(0, 2), 10) - 1;
-    const anoReferencia = this.referencia.substring(3, 7);
-    const dataReferencia = new Date(parseInt(anoReferencia, 10), mesReferencia, 1);
 
-    this.persistenciaService.getContasPorReferenciaEBanco(dataReferencia, this.bancoSelecionado).subscribe((data) => {
-      this.faturaCarregada = true;
-      if (data !== null && data.length > 0) {
-        this.itensFatura = data;
-        this.calcularTotais();
-      } else {
-        this.naoExisteFaturaNoBanco = true;
-      }
-    });
+    if (this.validaReferencia()) {
+      const mesReferencia = parseInt(this.referencia.substring(0, 2), 10) - 1;
+      const anoReferencia = this.referencia.substring(3, 7);
+      const dataReferencia = new Date(parseInt(anoReferencia, 10), mesReferencia, 1);
+
+      this.persistenciaService.getContasPorReferenciaEBanco(dataReferencia, this.bancoSelecionado).subscribe((data) => {
+        this.faturaCarregada = true;
+        if (data !== null && data.length > 0) {
+          this.itensFatura = data;
+          this.calcularTotais();
+        } else {
+          this.mensagemInfo = 'Não existem faturas no BD dessa referência/banco. ';
+          this.resetMensagens();
+          this.naoExisteFaturaNoBanco = true;
+        }
+      });
+    }
   }
 
   lerArquivo(event: any) {
