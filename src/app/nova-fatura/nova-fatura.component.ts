@@ -3,6 +3,11 @@ import { forEach } from '@angular/router/src/utils/collection';
 import { Conta } from '../conta';
 import { PersistenciaService } from 'app/persistencia.service';
 
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+
+import { NovaContaModalComponent } from 'app/nova-conta-modal/nova-conta-modal.component';
+import { RelatoriosComponent } from 'app/relatorios/relatorios.component';
+
 @Component({
   selector: 'app-nova-fatura',
   templateUrl: './nova-fatura.component.html',
@@ -23,6 +28,7 @@ export class NovaFaturaComponent implements OnInit {
   mensagemSucesso: string;
   mensagemErro: string;
   mensagemInfo: string;
+  modoAvulso = false;
 
   resumoConta = {
     totalConta: 0,
@@ -32,7 +38,7 @@ export class NovaFaturaComponent implements OnInit {
   };
 
 
-  constructor(private persistenciaService: PersistenciaService) { }
+  constructor(private persistenciaService: PersistenciaService, private modalService: NgbModal) { }
 
   ngOnInit() {
     this.bancoSelecionado = this.bancos[0];
@@ -63,6 +69,16 @@ export class NovaFaturaComponent implements OnInit {
     this.reiniciaVariaveis();
     this.faturaCarregada = false;
     this.naoExisteFaturaNoBanco = false;
+    this.modoAvulso = false;
+  }
+
+  verificaModoAvulso() {
+    this.modoAvulso = this.bancoSelecionado === 'Avulsos';
+  }
+
+  adicionarContaManual() {
+    const modalRef = this.modalService.open(NovaContaModalComponent);
+    // modalRef.componentInstance.name = 'World';
   }
 
   validaReferencia() {
@@ -77,7 +93,6 @@ export class NovaFaturaComponent implements OnInit {
   }
 
   carregarFatura() {
-
     if (this.validaReferencia()) {
       const mesReferencia = parseInt(this.referencia.substring(0, 2), 10) - 1;
       const anoReferencia = this.referencia.substring(3, 7);
@@ -247,7 +262,6 @@ export class NovaFaturaComponent implements OnInit {
 
 
   salvarFatura() {
-
     this.itensFatura.forEach((element) => {
       if (element._id !== undefined && element._id !== null) {
         this.persistenciaService.editaContaEspecifica(element).subscribe();
