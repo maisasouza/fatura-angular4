@@ -70,6 +70,8 @@ export class NovaFaturaComponent implements OnInit {
         self.preencherFaturaBradesco(conteudo, self);
       } else if (self.bancoSelecionado === 'Itau') {
         self.preencherFaturaItau(conteudo, self);
+      } else if (self.bancoSelecionado === 'BB') {
+        self.preencherFaturaBB(conteudo, self);
       }
     };
 
@@ -133,9 +135,42 @@ export class NovaFaturaComponent implements OnInit {
     self.calcularTotais();
   }
 
+  preencherFaturaBB(conteudoArquivo: string, self: any) {
+    const listaValores = conteudoArquivo.split('\n');
+
+    listaValores.forEach(function(linha, ind, arr){
+      if (self.isLinhaValida(linha)) {
+
+        const novaConta = new Conta();
+        const mesReferencia = self.referencia.substring(0, 2) - 1;
+        const anoReferencia = self.referencia.substring(3, 7);
+        const mesCompra = parseInt(linha.substring(3, 5), 10) - 1;
+        const anoCompra = (mesCompra <= mesReferencia) ? anoReferencia : anoReferencia - 1;
+
+        novaConta.referencia.$date = new Date(anoReferencia, mesReferencia, 1);
+        novaConta.data.$date = new Date(anoCompra, mesCompra, parseInt(linha.substring(0, 2), 10));
+        novaConta.banco = self.bancoSelecionado;
+        novaConta.descricao = linha.substring(10, 49);
+        novaConta.valor = Number(linha.substring(50, 69).replace('.', '').replace(',', '.'));
+        novaConta.valorEmDolar = Number(linha.substring(70, 81).replace('.', '').replace(',', '.'));
+
+        self.itensFatura.push(novaConta);
+        self.totalConta += novaConta.valor;
+      }
+    });
+
+    self.calcularTotais();
+  }
+
   isLinhaValida (linha: string) {
-    const data = linha.substring(0, 5);
-    return (data.match('[0-9][0-9]/[0-1][0-9]'))
+
+    if (this.bancoSelecionado === 'Itau' || this.bancoSelecionado === 'Bradesco') {
+      const data = linha.substring(0, 5);
+      return (data.match('[0-9][0-9]/[0-1][0-9]'))
+    } else {
+      const data = linha.substring(0, 10);
+      return data.match('[0-3][0-9]\.[0-1][0-9]\.[2][0][1-9][0-9]');
+    }
   }
 
   excluirItemFatura(itemCompra: Conta) {
@@ -175,9 +210,13 @@ export class NovaFaturaComponent implements OnInit {
 
 
   salvarFatura() {
-    this.persistenciaService.adicionarContas(this.itensFatura).subscribe((response) =>{
-      console.log('Salvei Faturaaa, resposta do BD: ');
-      console.log(response);
+
+    this.itensFatura.forEach((element) => {
+      if (element._id !== undefined && element._id !== null) {
+        this.persistenciaService.editaContaEspecifica(element).subscribe();
+      } else {
+        this.persistenciaService.adicionarContas([element]).subscribe();
+      }
     });
   }
 

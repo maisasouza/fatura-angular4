@@ -42,6 +42,10 @@ export class PersistenciaService {
     return this.http.delete('https://api.mlab.com/api/1/databases/faturadb/collections/contas/'+ conta._id.$oid +'?apiKey=X9Bn4_SbDdHZv8FekcL6CVCA35chhKGh&q=');
   }
 
+  public editaContaEspecifica(conta: Conta) {
+    return this.http.put('https://api.mlab.com/api/1/databases/faturadb/collections/contas/'+ conta._id.$oid +'?apiKey=X9Bn4_SbDdHZv8FekcL6CVCA35chhKGh&q=', conta);
+  }
+
   public adicionarContas(contas: Conta[]) {
     return this.http.post('https://api.mlab.com/api/1/databases/faturadb/collections/contas?apiKey=X9Bn4_SbDdHZv8FekcL6CVCA35chhKGh',
     contas);
