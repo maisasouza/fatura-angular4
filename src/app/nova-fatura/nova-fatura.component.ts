@@ -17,6 +17,9 @@ export class NovaFaturaComponent implements OnInit {
 
   bancos = ['Bradesco', 'BB', 'Itau', 'Avulsos'];
   rateio = ['Maisa', 'Elias', 'Rateio'];
+  categorias = ['uber', 'almoco', 'supermercado', 'martplus/verdemar/padaria',
+    'restaurantes', 'viagens', 'dogs', 'compras pessoais', 'carro', 'casa', 'farmacia'];
+
   referenciaMask = [/[0-1]/, /[0-9]/, '/', /[2]/, /[0]/, /[1-9]/, /[0-9]/];
   referencia: string;
   bancoSelecionado: string;
@@ -141,6 +144,7 @@ export class NovaFaturaComponent implements OnInit {
 
   preencherFaturaBradesco(conteudoArquivo: string, self: any) {
     const listaValores = conteudoArquivo.split('\n');
+    let ordem = 1;
 
     listaValores.forEach(function(linha, ind, arr){
       if (self.isLinhaValida(linha)) {
@@ -158,9 +162,11 @@ export class NovaFaturaComponent implements OnInit {
         novaConta.descricao = camposDaLinha[1];
         novaConta.valorEmDolar = Number(camposDaLinha[2].replace('.', '').replace(',', '.'));
         novaConta.valor = Number(camposDaLinha[3].replace('.', '').replace(',', '.'));
+        novaConta.ordemInsercao = ordem;
 
         self.itensFatura.push(novaConta);
         self.totalConta += novaConta.valor;
+        ordem++;
       }
     });
 
@@ -169,6 +175,7 @@ export class NovaFaturaComponent implements OnInit {
 
   preencherFaturaItau(conteudoArquivo: string, self: any) {
     const listaValores = conteudoArquivo.split('\n');
+    let ordem = 1;
 
     listaValores.forEach(function(linha, ind, arr){
       if (self.isLinhaValida(linha)) {
@@ -186,9 +193,11 @@ export class NovaFaturaComponent implements OnInit {
         novaConta.descricao = camposDaLinha[1];
         // novaConta.valorEmDolar = Number(camposDaLinha[2].replace('.', '').replace(',', '.'));
         novaConta.valor = Number(camposDaLinha[2].replace('.', '').replace(',', '.'));
+        novaConta.ordemInsercao = ordem;
 
         self.itensFatura.push(novaConta);
         self.totalConta += novaConta.valor;
+        ordem++;
       }
     });
 
@@ -197,6 +206,7 @@ export class NovaFaturaComponent implements OnInit {
 
   preencherFaturaBB(conteudoArquivo: string, self: any) {
     const listaValores = conteudoArquivo.split('\n');
+    let ordem = 1;
 
     listaValores.forEach(function(linha, ind, arr) {
       if (self.isLinhaValida(linha)) {
@@ -213,9 +223,11 @@ export class NovaFaturaComponent implements OnInit {
         novaConta.descricao = linha.substring(10, 49);
         novaConta.valor = Number(linha.substring(50, 69).replace('.', '').replace(',', '.'));
         novaConta.valorEmDolar = Number(linha.substring(70, 81).replace('.', '').replace(',', '.'));
+        novaConta.ordemInsercao = ordem;
 
         self.itensFatura.push(novaConta);
         self.totalConta += novaConta.valor;
+        ordem++;
       }
     });
 
@@ -239,6 +251,9 @@ export class NovaFaturaComponent implements OnInit {
     if (index === -1) {
       console.log('ERRO - Não deveria excluir uma compra que nao está na lista');
     } else {
+      if (itemCompra._id !== undefined) {
+        this.persistenciaService.removeContaEspecifica(itemCompra);
+      }
       this.itensFatura.splice(index, 1);
       this.calcularTotais();
     }

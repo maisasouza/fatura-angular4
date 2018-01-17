@@ -23,8 +23,13 @@ export class PersistenciaService {
       }
     };
 
+    const sort = {
+      'ordemInsercao': 1
+    };
+
     return this.http.get<Conta[]>('https://api.mlab.com/api/1/databases/faturadb/collections/contas' +
-          '?apiKey=X9Bn4_SbDdHZv8FekcL6CVCA35chhKGh&q=' + JSON.stringify(query));
+          '?apiKey=X9Bn4_SbDdHZv8FekcL6CVCA35chhKGh&q=' + JSON.stringify(query) +
+          '&s=' + JSON.stringify(sort));
   }
 
   public removeContasPorReferenciaEBanco(referencia: Date, banco: string) {

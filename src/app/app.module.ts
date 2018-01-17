@@ -7,6 +7,7 @@ import { HttpClientModule } from '@angular/common/http';
 
 import { TextMaskModule } from 'angular2-text-mask';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { AngularFontAwesomeModule } from 'angular-font-awesome';
 
 import { AppComponent } from './app.component';
 import { NovaFaturaComponent } from './nova-fatura/nova-fatura.component';
@@ -33,6 +34,7 @@ const appRoutes: Routes = [
     HttpModule,
     HttpClientModule,
     NgbModule.forRoot(),
+    AngularFontAwesomeModule,
     TextMaskModule,
     RouterModule.forRoot(
       appRoutes

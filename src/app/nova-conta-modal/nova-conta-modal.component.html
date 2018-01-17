@@ -1,10 +1,11 @@
 <div class="modal-header">
     <h4 class="modal-title">Conta avulsa</h4>
-    <button type="button" class="close" aria-label="Close" (click)="activeModal.dismiss('Cross click')">
+    <button type="button" class="close" aria-label="Close" (click)="activeModal.close()">
       <span aria-hidden="true">&times;</span>
     </button>
 </div>
 <div class="modal-body">
+    <div class="alert alert-danger" role="alert" *ngIf="mensagemErro"> {{mensagemErro}} </div>
     <div class="form-group">
         <label for="dataCompraInput">Data Compra</label>
         <input type="text" name="dataCompraInput" class="form-control" placeholder="dd/mm" [(ngModel)]="dataCompra" [textMask]="{mask: dataCompraMask}">
