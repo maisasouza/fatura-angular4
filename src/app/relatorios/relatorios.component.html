@@ -5,6 +5,18 @@
     <div class="alert alert-danger" role="alert" *ngIf="mensagemErro"> {{mensagemErro}} </div>
     <form>
         <div class="form-group">
+            <label for="inputReferencia"> Tipo Relatório </label>
+            <select class="form-control" name="tipoRelatorioSelect" [(ngModel)]="tipoRelatorioSelecionado">
+                <option *ngFor="let tipoRelatorio of tiposRelatorio" [ngValue]="tipoRelatorio"> {{ tipoRelatorio }} </option>
+            </select>
+        </div>
+        <div class="form-group" *ngIf="tipoRelatorioSelecionado === 'Por banco'">
+            <label for="inputReferencia"> Banco </label>
+            <select class="form-control" name="bancosSelect" [(ngModel)]="bancoSelecionado">
+                    <option *ngFor="let banco of bancos" [ngValue]="banco"> {{ banco }} </option>
+                </select>
+        </div>
+        <div class="form-group" *ngIf="tipoRelatorioSelecionado === 'Mensal'">
             <label for="inputReferencia">Referência</label>
             <input type="text" class="form-control" name="inputReferencia" aria-describedby="emailHelp" placeholder="mm/aaaa" [(ngModel)]=referencia [textMask]="{mask: referenciaMask}">
             <small class="form-text text-muted"> Mês do vencimento da fatura </small>

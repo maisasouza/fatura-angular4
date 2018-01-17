@@ -127,6 +127,9 @@ export class NovaFaturaComponent implements OnInit {
   lerArquivo(event: any) {
     const self = this;
     const fileReader = new FileReader();
+    this.itensFatura = new Array<Conta>();
+    this.reiniciaVariaveis();
+
     fileReader.onload = function () {
       const conteudo = fileReader.result;
       if (self.bancoSelecionado === 'Bradesco') {

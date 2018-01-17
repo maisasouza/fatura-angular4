@@ -32,6 +32,20 @@ export class PersistenciaService {
           '&s=' + JSON.stringify(sort));
   }
 
+  public getContasPorBanco(banco: string) {
+    const query = {
+      'banco': banco,
+    };
+
+    const sort = {
+      'referencia': 1,
+    };
+
+    return this.http.get<Conta[]>('https://api.mlab.com/api/1/databases/faturadb/collections/contas' +
+          '?apiKey=X9Bn4_SbDdHZv8FekcL6CVCA35chhKGh&q=' + JSON.stringify(query) +
+          '&s=' + JSON.stringify(sort));
+  }
+
   public removeContasPorReferenciaEBanco(referencia: Date, banco: string) {
     const query = {
       'banco': banco,

@@ -11,9 +11,13 @@ import { PersistenciaService } from 'app/persistencia.service';
 })
 export class RelatoriosComponent implements OnInit {
 
+  tiposRelatorio = ['Mensal'];
   bancos = ['Bradesco', 'BB', 'Itau', 'Avulsos'];
   rateio = ['Maisa', 'Elias', 'Rateio'];
   referenciaMask = [/[0-1]/, /[0-9]/, '/', /[2]/, /[0]/, /[1-9]/, /[0-9]/];
+
+  tipoRelatorioSelecionado: string;
+  bancoSelecionado: string;
   referencia: string;
   resultado = new Array<Relatorio>();
   consolidado = new Relatorio();
@@ -35,7 +39,19 @@ export class RelatoriosComponent implements OnInit {
     const self = this;
     this.resultado = new Array<Relatorio>();
     this.consolidado = new Relatorio();
-    
+
+    if (this.tipoRelatorioSelecionado === 'Mensal') {
+      this.verRelatorioMensal();
+    } else if(this.tipoRelatorioSelecionado === 'Por banco') {
+      this.verRelatorioHistoricoBanco();
+    } else if(this.tipoRelatorioSelecionado === 'Geral') {
+      this.verRelatorioGeral();
+    }
+  }
+
+  verRelatorioMensal() {
+    const self = this;
+
     if (this.validaReferencia()) {
       this.bancos.forEach(banco => {
         const referencia = self.getReferenciaFormatoDate();
@@ -51,6 +67,25 @@ export class RelatoriosComponent implements OnInit {
         });
       });
     }
+  }
+
+  verRelatorioHistoricoBanco() {
+    const self = this;
+
+    if (this.bancoSelecionado === undefined) {
+      this.mensagemErro = 'Deve selecionar um banco.';
+      this.resetMensagens();
+    } else {
+      this.persistenciaService.getContasPorBanco(this.bancoSelecionado).subscribe((contas) => {
+
+      });
+    }
+
+
+  }
+
+  verRelatorioGeral() {
+    const self = this;
   }
 
   calculaRelatorio(ref: Date, banco: string, contas: Conta[]) {
