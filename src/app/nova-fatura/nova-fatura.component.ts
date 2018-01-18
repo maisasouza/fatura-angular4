@@ -255,7 +255,9 @@ export class NovaFaturaComponent implements OnInit {
       console.log('ERRO - Não deveria excluir uma compra que nao está na lista');
     } else {
       if (itemCompra._id !== undefined) {
-        this.persistenciaService.removeContaEspecifica(itemCompra);
+        this.persistenciaService.removeContaEspecifica(itemCompra).subscribe((res)=>{
+          console.log('Conta removida com sucesso !');
+        });
       }
       this.itensFatura.splice(index, 1);
       this.calcularTotais();
